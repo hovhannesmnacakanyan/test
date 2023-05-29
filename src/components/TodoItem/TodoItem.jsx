@@ -1,6 +1,8 @@
 import React from "react";
 
-export const TodoItem = ({ todo, handleCheckChange }) => {
+export const TodoItem = (props) => {
+  const { todo, handleCheckChange } = props;
+
   return (
     <li>
       <input

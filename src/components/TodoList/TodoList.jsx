@@ -1,17 +1,27 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { TodoItem } from "../TodoItem/TodoItem";
+import { getLocaleItem, setLocaleItem } from "../../helpers";
 
 export const TodoList = () => {
-  const initialTodos = [
-    { id: 1, text: "item 1", isDone: false },
-    { id: 2, text: "item 2", isDone: false },
-    { id: 3, text: "item 3", isDone: false },
-    { id: 4, text: "item 4", isDone: false },
-    { id: 5, text: "item 5", isDone: false },
-  ];
-
-  const [todos, setTodos] = useState(initialTodos);
+  const [todos, setTodos] = useState([]);
   const [value, setValue] = useState("");
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const storageTodos = getLocaleItem("todos");
+
+    if (storageTodos) {
+      setTodos(storageTodos);
+    }
+  }, []);
+
+  useEffect(() => {
+    setLocaleItem("todos", todos);
+  }, [todos]);
+
+  const toggleVisible = () => {
+    setIsVisible((prevState) => !prevState);
+  };
 
   const handleCheckChange = (id) => {
     setTodos((prev) => {
@@ -30,10 +40,12 @@ export const TodoList = () => {
       return;
     }
 
-    setTodos((prev) => [
-      ...prev,
-      { id: prev.at(-1).id + 1, text: value, isDone: false },
-    ]);
+    setTodos((prev) => {
+      return [
+        ...prev,
+        { id: (prev.at(-1)?.id || 0) + 1, text: value, isDone: false },
+      ];
+    });
 
     setValue("");
   };
@@ -50,6 +62,8 @@ export const TodoList = () => {
         {todos.map((todo) => {
           return (
             <TodoItem
+              isVisible={isVisible}
+              toggleVisible={toggleVisible}
               todo={todo}
               handleCheckChange={handleCheckChange}
               key={todo.id}
